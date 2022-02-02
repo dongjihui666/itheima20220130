@@ -44,6 +44,23 @@ public class ShopCarTest {
 
     public static void pay(Goods[] shopCar) {
 
+        query(shopCar);
+        /**
+         * 定义一个求和变量累加金额
+         */
+        double money = 0;
+        //2 遍历购物车数组中的全部对象,要单价+数量
+        for (int i = 0; i < shopCar.length; i++) {
+            Goods g = shopCar[i];
+            if (g !=null){
+                money += (g.price * g.buyNumber);
+            }else {
+
+                break;
+            }
+        }
+        System.out.println("订单总金额" + money);
+
     }
 
     public static void update(Goods[] shopCar, Scanner sc) {
