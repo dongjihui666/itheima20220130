@@ -1,5 +1,7 @@
 package com.dong;
 
+import sun.security.util.Password;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -25,6 +27,7 @@ public class ATMSystem {
             switch (command){
                 case 1:
                     //登录
+                    login(accounts,sc);
                     break;
                 case 2:
                     //开户
@@ -32,6 +35,47 @@ public class ATMSystem {
                     break;
                 default:
                     System.out.println("您当前输入的操作命令不被支持");
+            }
+        }
+    }
+
+    /**
+     * 用户登录功能实现
+     * 分析
+     * 1定义方法: public static void login(ArrayList<Account> accounts){}
+     * 2让用户键盘录入卡号,根据卡号查询账户对象.
+     * 3如果没有找到了账户对象,说明卡号不存在,提示继续输入卡号
+     * 4如果找到了账户对象,说明卡号存在,继续输入密码
+     * @param accounts
+     */
+    private static void login(ArrayList<Account> accounts,Scanner sc) {
+
+        //2 让用户键盘录入卡号,根据卡号查询账户对象.
+        System.out.println("===========银行ATM系统登录界面==============");
+        while (true) {
+            System.out.println("请您输入您的卡号");
+            String carId = sc.next();
+
+            //根据卡号查询账户对象
+            Account accountByCardId = getAccountByCardId(carId, accounts);
+
+            //3 判断账户对象是否存在,存在卡号没有问题
+            if (accountByCardId != null){
+                while (true) {
+                    //4 让用户继续输入密码
+                    System.out.println("请您输入您的密码");
+                    String password = sc.next();
+                    //5 判断密码是否正确
+                    if (accountByCardId.getCardId().equals(password)){
+                        //密码正确,登录成功
+                        //展示系统登录后的操作界面
+                        System.out.println("登录成功");
+                    }else {
+                        System.out.println("您输入的密码不一致.请您重新输入");
+                    }
+                }
+            }else {
+                System.out.println("对不起不存在该卡号的账户");
             }
         }
     }
