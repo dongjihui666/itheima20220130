@@ -72,8 +72,10 @@ public class ATMSystem {
                     //5 判断密码是否正确
                     if (accountByCardId.getPassWord().equals(password)){
                         //密码正确,登录成功
-                        //展示系统登录后的操作界面
+
                         System.out.println("登录成功");
+                        //展示系统登录后的操作界面
+                        showUserCommand(sc,accountByCardId);
                     }else {
                         System.out.println("您输入的密码不一致.请您重新输入");
                     }
@@ -82,6 +84,65 @@ public class ATMSystem {
                 System.out.println("对不起不存在该卡号的账户");
             }
         }
+    }
+
+    /**
+     * 用户操作页设计,查询账户,退出账户功能分析
+     *查询就是直接展示当前登录成功的账户对象的信息
+     * 退出账户是需要回到首页的
+     */
+    private static void showUserCommand(Scanner sc,Account accountByCardId) {
+
+        System.out.println("==========用户操作界面=============");
+        System.out.println("1 查询账户");
+        System.out.println("2 存款");
+        System.out.println("3 取款");
+        System.out.println("4 转账");
+        System.out.println("5 修改密码");
+        System.out.println("6 退出");
+        System.out.println("7 注销账户");
+        while (true) {
+            System.out.println("请您输入操作命令");
+            int command = sc.nextInt();
+            switch (command){
+                case 1:
+                    //查询账户
+                    showAccount(accountByCardId);
+                    break;
+                case 2:
+                    //存款
+                    break;
+                case 3:
+                    //取款
+                    break;
+                case 4:
+                    //转账
+                    break;
+                case 5:
+                    //修改密码
+                    break;
+                case 6:
+                    //退出
+                    System.out.println("欢迎下次光临!");
+                    return;//结束当前操作的方法
+                case 7:
+                    //注销账户
+                    break;
+                default:
+                    System.out.println("没有该命令");
+                    break;
+
+            }
+        }
+    }
+
+    private static void showAccount(Account accountByCardId) {
+
+        System.out.println("===========当前账户详情==============");
+        System.out.println("卡号" + accountByCardId.getCardId());
+        System.out.println("姓名" + accountByCardId.getUserName());
+        System.out.println("余额" + accountByCardId.getMoney());
+        System.out.println("当次限额" + accountByCardId.getQuotaMoney());
     }
 
     /**
