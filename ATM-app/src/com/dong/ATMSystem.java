@@ -50,6 +50,10 @@ public class ATMSystem {
      */
     private static void login(ArrayList<Account> accounts,Scanner sc) {
 
+        if(accounts.size() == 0){
+            System.out.println("当前系统中无任何用户,您需要先注册");
+            return;//直接结束方法的执行.
+        }
         //2 让用户键盘录入卡号,根据卡号查询账户对象.
         System.out.println("===========银行ATM系统登录界面==============");
         while (true) {
@@ -66,7 +70,7 @@ public class ATMSystem {
                     System.out.println("请您输入您的密码");
                     String password = sc.next();
                     //5 判断密码是否正确
-                    if (accountByCardId.getCardId().equals(password)){
+                    if (accountByCardId.getPassWord().equals(password)){
                         //密码正确,登录成功
                         //展示系统登录后的操作界面
                         System.out.println("登录成功");
