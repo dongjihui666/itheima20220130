@@ -75,7 +75,7 @@ public class ATMSystem {
 
                         System.out.println("登录成功");
                         //展示系统登录后的操作界面
-                        showUserCommand(sc,acc);
+                        showUserCommand(sc,acc,accounts);
                     }else {
                         System.out.println("您输入的密码不一致.请您重新输入");
                     }
@@ -91,7 +91,7 @@ public class ATMSystem {
      *查询就是直接展示当前登录成功的账户对象的信息
      * 退出账户是需要回到首页的
      */
-    private static void showUserCommand(Scanner sc,Account acc) {
+    private static void showUserCommand(Scanner sc,Account acc,ArrayList<Account> accounts) {
         while (true) {
         System.out.println("==========用户操作界面=============");
         System.out.println("1 查询账户");
@@ -115,25 +115,171 @@ public class ATMSystem {
                     break;
                 case 3:
                     //取款
+                    drawMoney(acc,sc);
                     break;
                 case 4:
                     //转账
+                    transferMoney(accounts,acc,sc);
                     break;
                 case 5:
                     //修改密码
-                    break;
+                    updatePassword(acc,sc);
+                    return;
                 case 6:
                     //退出
                     System.out.println("欢迎下次光临!");
                     return;//结束当前操作的方法
                 case 7:
                     //注销账户
-                    break;
+                    //直接从当前集合中抹掉当前对象即可
+                    accounts.remove(acc);
+                    System.out.println("销户成功了!");
+                    return;
                 default:
                     System.out.println("没有该命令");
                     break;
 
             }
+        }
+    }
+
+    /**
+     *
+     * @param acc
+     */
+    private static void updatePassword(Account acc,Scanner sc ) {
+        System.out.println("===========修改密码==============");
+        while (true) {
+            System.out.println("请您输入正确的密码");
+            String okPassword = sc.next();
+            if (acc.getPassWord().equals(okPassword)){
+                //可以输入新密码
+                while (true) {
+                    System.out.println("请您输入新的密码");
+                    String newPassWord = sc.next();
+
+                    System.out.println("请您确认新的密码");
+                    String okNewPassWord =sc.next();
+
+                    if(newPassWord.equals(okNewPassWord)){
+                        //修改账户对象的密码为新密码
+                        acc.setPassWord(newPassWord);
+                        return;//代表修改密码结束
+                    }else {
+                        System.out.println("您两次输入的密码不一致");
+                    }
+                }
+
+
+            }else {
+                System.out.println("您输入的密码不正确");
+            }
+        }
+    }
+
+    /**
+     * 转账功能
+     * 1 转账功能需要判断系统中是否有2个账户对象及以上.
+     * 2 同时还要判断自己账户是否有钱.
+     * 3 接下来需要输入对方卡号,判断对方账户是否存在.
+     * 4 对方账户存在还需要认证对方户主的姓氏
+     * 5 满足要求则可以把自己账户对象的金额修改到对方账户对象中去.
+     * @param accounts
+     * @param acc
+     * @param sc
+     */
+    private static void transferMoney(ArrayList<Account> accounts, Account acc, Scanner sc) {
+
+        // 1 判断系统中是否有2个账户及以上
+        if (accounts.size()<2){
+            System.out.println("对不起,系统无其他账户,您不可以转账");
+            return;
+        }
+        //2 判断自己的账户对象中是否有钱
+        if(acc.getMoney() == 0 ){
+            System.out.println("账户余额为0");
+            return;
+        }
+        //3 开始转账逻辑
+        while (true) {
+            System.out.println("请您输入对象账户的卡号");
+            String carId = sc.next();
+            Account account =  getAccountByCardId(carId,accounts);
+            if (account != null){
+                //判断这个账户对象是否是当前登录的账户自己
+                if (account.getCardId().equals(acc.getCardId())){
+                    //正在给自己转账
+                    System.out.println("您不可以为自己转账!");
+                }else {
+                    //确认对方的姓氏
+                    String name = "*" + account.getUserName().substring(1);
+                    System.out.println("请您确认{"+ name + "}的姓氏");
+                    String preName = sc.next();
+
+                    //判断
+                    if (account.getUserName().startsWith(preName)){
+
+                        //真正开始转账了.
+                        System.out.println("请您输入转账的金额");
+                        double money = sc.nextDouble();
+                        //判断金额是否超过了自己的余额
+                        if (money > acc.getMoney()){
+                            System.out.println("对不起,您要转账的金额太多,您最多可以转账"+ acc.getMoney());
+
+                        }else {
+                            //真的可以转了
+                            acc.setMoney(acc.getMoney() - money);
+                            account.setMoney(account.getMoney() + money);
+                            System.out.println("恭喜您转账成功了,已经为" + acc.getUserName()+"转账多少" + money);
+                            showAccount(acc);
+                            return;
+                        }
+                    }else{
+                        System.out.println("对不起您认证的信息有误");
+                    }
+                }
+            }else {
+                System.out.println("对不起您输入的转账卡号有问题");
+            }
+        }
+    }
+
+    /**
+     * 取款
+     * 1 取款需要先判断账户是否有钱.
+     * 2 有钱则拿到自己账户对象
+     * 3 然后让用户输入取款金额
+     * 4 判断取款金额是否超过了当次限额,以及余额是否足够
+     * 5 满足要求则调用账户对象的setMoney方法完成金额的修改.
+     *
+     * @param acc
+     * @param sc
+     */
+    private static void drawMoney(Account acc, Scanner sc) {
+        System.out.println("===========取款操作==============");
+        //1 判断账户是否足够100元
+        if(acc.getMoney()>=100 ){
+            while (true) {
+                System.out.println("请您输入取款的金额");
+                double money = sc.nextDouble();
+                //判断金额有没有超过当次限额
+                if (money> acc.getQuotaMoney()){
+                    System.out.println("您当次取款金额超过每次限额,不要取那么多,最多取"+ acc.getQuotaMoney());
+                }else {
+
+                    //3 判断当前余额是否足够你取钱
+                    if (acc.getMoney() >= money){
+                        acc.setMoney(acc.getMoney()-money);
+                        System.out.println("恭喜你取钱"+ money +  "成功,当前账户还剩余" + acc.getMoney());
+                        return;//取钱后干掉
+                    }else {
+
+                        System.out.println("您当前的余额不足");
+                    }
+                }
+            }
+        }else {
+            System.out.println("您自己的金额没有超过100元,您就别取了");
         }
     }
 
