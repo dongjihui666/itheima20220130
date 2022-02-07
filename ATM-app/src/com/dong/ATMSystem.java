@@ -61,21 +61,21 @@ public class ATMSystem {
             String carId = sc.next();
 
             //根据卡号查询账户对象
-            Account accountByCardId = getAccountByCardId(carId, accounts);
+            Account acc = getAccountByCardId(carId, accounts);
 
             //3 判断账户对象是否存在,存在卡号没有问题
-            if (accountByCardId != null){
+            if (acc != null){
                 while (true) {
                     //4 让用户继续输入密码
                     System.out.println("请您输入您的密码");
                     String password = sc.next();
                     //5 判断密码是否正确
-                    if (accountByCardId.getPassWord().equals(password)){
+                    if (acc.getPassWord().equals(password)){
                         //密码正确,登录成功
 
                         System.out.println("登录成功");
                         //展示系统登录后的操作界面
-                        showUserCommand(sc,accountByCardId);
+                        showUserCommand(sc,acc);
                     }else {
                         System.out.println("您输入的密码不一致.请您重新输入");
                     }
@@ -91,8 +91,8 @@ public class ATMSystem {
      *查询就是直接展示当前登录成功的账户对象的信息
      * 退出账户是需要回到首页的
      */
-    private static void showUserCommand(Scanner sc,Account accountByCardId) {
-
+    private static void showUserCommand(Scanner sc,Account acc) {
+        while (true) {
         System.out.println("==========用户操作界面=============");
         System.out.println("1 查询账户");
         System.out.println("2 存款");
@@ -101,16 +101,17 @@ public class ATMSystem {
         System.out.println("5 修改密码");
         System.out.println("6 退出");
         System.out.println("7 注销账户");
-        while (true) {
+
             System.out.println("请您输入操作命令");
             int command = sc.nextInt();
             switch (command){
                 case 1:
                     //查询账户
-                    showAccount(accountByCardId);
+                    showAccount(acc);
                     break;
                 case 2:
                     //存款
+                    depositMoner(acc,sc);
                     break;
                 case 3:
                     //取款
@@ -136,13 +137,29 @@ public class ATMSystem {
         }
     }
 
-    private static void showAccount(Account accountByCardId) {
+    /**
+     * 存钱
+     * @param acc
+     */
+    private static void depositMoner(Account acc,Scanner sc) {
+
+        System.out.println("===========存钱操作==============");
+        System.out.println("请您输入存款的金额");
+        double money = sc.nextDouble();
+
+        //直接把金额修改到账户对象的money属性中去
+        acc.setMoney(acc.getMoney()+ money);
+        System.out.println("存款完成!");
+        showAccount(acc);
+    }
+
+    private static void showAccount(Account acc) {
 
         System.out.println("===========当前账户详情==============");
-        System.out.println("卡号" + accountByCardId.getCardId());
-        System.out.println("姓名" + accountByCardId.getUserName());
-        System.out.println("余额" + accountByCardId.getMoney());
-        System.out.println("当次限额" + accountByCardId.getQuotaMoney());
+        System.out.println("卡号" + acc.getCardId());
+        System.out.println("姓名" + acc.getUserName());
+        System.out.println("余额" + acc.getMoney());
+        System.out.println("当次限额" + acc.getQuotaMoney());
     }
 
     /**
