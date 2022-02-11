@@ -8,6 +8,16 @@ public class VerifyTool {
     /**
      * 静态方法
      */
+    /**
+     * 私有构造器
+     *
+     * @param
+     * @return
+     */
+
+    private VerifyTool(){
+
+    }
 
     public static String createCode(int n){
         //验证码
