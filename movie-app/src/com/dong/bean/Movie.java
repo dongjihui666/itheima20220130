@@ -11,7 +11,7 @@ public class Movie {
     private int number;  //余票
     private Date startTime;//放映时间
 
-    public Movie(String name, String actor, double score, double time, double price, int number, Date startTime) {
+    public Movie(String name, String actor, double score, double time, double price, Date startTime) {
         this.name = name;
         this.actor = actor;
         this.score = score;
@@ -21,8 +21,6 @@ public class Movie {
         this.startTime = startTime;
     }
 
-    public Movie() {
-    }
 
     public String getName() {
         return name;

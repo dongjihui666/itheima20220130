@@ -4,8 +4,12 @@ import com.dong.bean.Business;
 import com.dong.bean.Customer;
 import com.dong.bean.Movie;
 import com.dong.bean.User;
+import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class MovieSystem {
     /**
@@ -19,6 +23,12 @@ public class MovieSystem {
 
     //定义一个静态的用户变量,记住当前登录成功的用户对象
     public static User loginUser;
+
+    //定义一个时间类型
+    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    //日志
+     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger("MoviesSystem.class");
 
     /**
      * 2 存储系统全部商家和排片信息
@@ -168,11 +178,11 @@ public class MovieSystem {
             switch (command){
                 case "1":
                     //展示全部排片信息
-                    //queryMySelf();
+                    showBusinessInfos();
                     break;
                 case "2":
                     //上架电影信息
-                    //addMovies();
+                    addMovies();
                     break;
                 case "3":
                     //下架电影信息
@@ -184,10 +194,76 @@ public class MovieSystem {
                     break;
                 case "5":
                     //退出
-                    break;
+                    System.out.println(loginUser.getUserName()+"请您下次再来");
+                    return;
                 default:
                     System.out.println("您输入的命令有问题,请您从新输入");
             }
+        }
+
+    }
+
+    /**
+     * 商家进行电影上架  :Map<Business,List<Movie> ALL_MOVIES>
+     *
+     */
+    private static void addMovies() {
+        System.out.println("================电影院上架影片==================-");
+        //1 先让用户输入商家
+        //2 根据商家直接提取它的影片值集合
+        Business business = (Business) loginUser;
+        List<Movie> movies = ALL_MOVIES.get(business);
+
+        System.out.println("请您输入新片名");
+        String name = sc.nextLine();
+        System.out.println("请您输入主演");
+        String actor = sc.nextLine();
+        System.out.println("请您输入时长");
+        String time = sc.nextLine();
+        System.out.println("请您输入票价");
+        String price = sc.nextLine();
+        System.out.println("请您输入票数");
+        String totalNumber = sc.nextLine();
+        while (true) {
+            System.out.println("请您输入影片放映时间:");
+            String stime = sc.nextLine();
+
+            //字符串转成Data类型
+            // SimpleDateFormat.parse 从字符串分析Date。
+            try {
+                //public Movie(String name, String actor, double score, double time, double price, int number, Date startTime)
+                Movie movie = new Movie(name, actor, Double.valueOf(time), Double.valueOf(price), Integer.valueOf(totalNumber), sdf.parse(stime));
+                //添加影片信息
+                movies.add(movie);
+                System.out.println("您已经成功上架了"+movie.getName());
+                return;//直接退出去
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * 展示商家的详细:展示当前商家的信息
+     */
+    private static void showBusinessInfos() {
+        System.out.println("=============商家详情页面===================");
+        // 根据商家对象,作为Map集合的键,提取对应的值就是其拍片信息:Map<Business,List<Movie> ALL_MOVIES>
+        //把loginUser转换成Business
+        Business business = (Business) loginUser;
+        System.out.println(business.getShopName()+"\t\t电话:" + business.getPhone()+"\t\t地址:" + business.getAddress());
+        System.out.println(MovieSystem.loginUser);
+        List<Movie> movies = ALL_MOVIES.get(MovieSystem.loginUser);
+
+        if (movies.size()>0){
+            System.out.println("片名\t\t主演\t\t市场\t\t评分\t\t票价\t\t余票数量\t\t放映时间");
+            for (Movie movie : movies) {
+                System.out.println(movie.getName()+"\t\t"+ movie.getActor()+"\t\t"+movie.getTime()+"\t\t"+movie.getScore()+"\t\t"+movie.getPrice()+"\t\t"+
+                        movie.getNumber()+"\t\t"+movie.getNumber()+"\t\t"+sdf.format(movie.getStartTime()));
+            }
+        }else {
+            System.out.println("您的当前店铺无片可播放");
         }
 
     }
@@ -249,4 +325,5 @@ public class MovieSystem {
         }
         return null;//查询没有用户登录名称
     }
+
 }
