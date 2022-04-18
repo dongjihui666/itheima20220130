@@ -5,6 +5,7 @@ import com.dong.bean.Customer;
 import com.dong.bean.Movie;
 import com.dong.bean.User;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -382,7 +383,7 @@ public class MovieSystem {
             switch (command) {
                 case "1":
                     //展示全部排片信息
-                    //queryAllMovies();
+                    AllMovies();
                     break;
                 case "2":
                     //根据电影名称查询电影信息
@@ -394,6 +395,7 @@ public class MovieSystem {
                     break;
                 case "4":
                     //购票系统
+                    buyMovie();
                     break;
                 case "5":
                     //退出
@@ -404,6 +406,138 @@ public class MovieSystem {
             }
         }
 
+    }
+
+    /**
+     * 用户购票功能  ALL_MOVIES = {b1=[p1,p2,p3],b2=[p2,p3]}
+     *
+     */
+    private static void buyMovie() {
+        showMain();
+        System.out.println("==============展示全部商家排片信息====================-");
+        while (true) {
+            System.out.println("请您输入需要买票的门店:");
+            String shopName = sc.nextLine();
+            //1 查询是否存在该商家.
+            Business business = getUserByShopName(shopName);
+            if (business == null){
+                System.out.println("对不起,没有该店铺,请确认");
+            }else {
+                //2 此商家全部的排片
+                List<Movie> movies = ALL_MOVIES.get(business);
+                //3 判断是否存在上映的电影
+                if (movies.size()>0){
+                    while (true) {
+                        //4 开始进行选片
+                        System.out.println("请您输入需要购买的电影名称:");
+                        String movieName = sc.nextLine();
+
+                        //去当前商家下查询该电影对象
+                        Movie movie = getMovieByShopAndName(business,movieName);
+                        if (movie != null){
+                            //开始购买
+                            while (true) {
+                                System.out.println("请您输入要购买的电影票数:");
+                                String number = sc.nextLine();
+                                int buyNumber = Integer.valueOf(number);
+                                //判断电影是否购票
+                                if (movie.getNumber() >= buyNumber){
+                                    //可以购买
+                                    //当前需要花费的金额
+                                    double money = BigDecimal.valueOf(movie.getPrice()).multiply( BigDecimal.valueOf(buyNumber)).doubleValue() ;
+                                    if (loginUser.getMoney() >= money){
+                                        //终于 可以买票了
+                                        System.out.println("您成功购买了 +"+ movie.getNumber() + buyNumber +"张票");
+                                        //更新自己的金额,更新商家的金额
+                                        loginUser.setMoney(loginUser.getMoney()-money);
+                                        business.setMoney(business.getMoney()+money);
+                                        movie.setNumber(movie.getNumber()-buyNumber);
+                                        return;//结束方法
+                                    }else {
+                                        System.out.println("是否继续");
+                                        System.out.println("钱不够 y/n");
+                                        String command = sc.nextLine();
+                                        switch (command){
+                                            case "y":
+                                                break;
+                                            case "n":
+                                                System.out.println("好的");
+                                                return;
+                                        }
+                                    }
+                                }else {
+                                    //票数不够
+                                    System.out.println("您当前最多可以购买" + movie.getNumber());
+                                    System.out.println("是否继续买票?y/n");
+                                    String command = sc.nextLine();
+                                    switch (command){
+                                        case "y":
+                                            break;
+                                        case "n":
+                                            System.out.println("好的!");
+                                            return;
+                                    }
+                                }
+                            }
+                        }else {
+                            System.out.println("电影名称有毛病");
+                        }
+                    }
+
+                }else {
+                    System.out.println("该电影院关门-----");
+                    System.out.println("是否继续买票? y/n");
+                    String commend = sc.nextLine();
+                    switch (commend){
+                        case "y":
+                            break;
+                        case "n":
+                            System.out.println("好的");
+                            return;
+                    }
+                }
+            }
+        }
+    }
+    public static Movie getMovieByShopAndName(Business business,String name){
+        List<Movie> movies = ALL_MOVIES.get(business);
+        for (Movie movie : movies) {
+            if (movie.getName().contains(name)){
+                return movie;
+            }
+        }
+        return null;
+
+    }
+
+
+    /**
+     * 根据商家店铺名称查询商家对象
+     * @return
+     */
+    public static Business getUserByShopName(String shopName){
+        Set<Business> businesses =  ALL_MOVIES.keySet();
+        for (Business business:businesses){
+            if (business.getShopName().equals(shopName)){
+                return business;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 展示全部商家和其排片信息
+     */
+    private static void AllMovies() {
+        System.out.println("==============展示全部商家排片信息====================-");
+        ALL_MOVIES.forEach((business,movies)->{
+            System.out.println(business.getShopName() + "\t\t电话:" + business.getPhone() + "\t\t地址:" + business.getAddress());
+            System.out.println("\t\t片名\t\t主演\t\t市场\t\t评分\t\t票价\t\t余票数量\t\t放映时间");
+            for (Movie movie : movies) {
+                System.out.println(movie.getName() + "\t\t" + movie.getActor() + "\t\t" + movie.getTime() + "\t\t" + movie.getScore() + "\t\t" + movie.getPrice() + "\t\t" +
+                        movie.getNumber() + "\t\t" + movie.getNumber() + "\t\t" + sdf.format(movie.getStartTime()));
+            }
+        });
     }
 
     /**
@@ -423,4 +557,4 @@ public class MovieSystem {
     }
 
 }
-//p151 18.41
+//p152 24.34
