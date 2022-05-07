@@ -1,0 +1,33 @@
+package com.dong.snake;
+
+import javax.swing.*;
+import java.net.URL;
+import java.util.Date;
+
+/**
+ * 存放外部的数据
+ */
+public class Data {
+
+    //头部的图片  URL:定位图片的地址   ImageIcon:图片
+    public static URL headerUrl = Date.class.getResource("/statics/header.png");
+    public static ImageIcon header = new ImageIcon(headerUrl);
+
+    //头部:
+    public static URL upUrl = Date.class.getResource("/statics/up.png");
+    public static URL downUrl = Date.class.getResource("/statics/down.png");
+    public static URL leftUrl = Date.class.getResource("/statics/left.png");
+    public static URL rightUrl = Date.class.getResource("/statics/right.png");
+    public static ImageIcon up = new ImageIcon(upUrl);
+    public static ImageIcon down = new ImageIcon(downUrl);
+    public static ImageIcon left = new ImageIcon(leftUrl);
+    public static ImageIcon right = new ImageIcon(rightUrl);
+    //身体
+    public static URL bodyUrl = Date.class.getResource("/statics/body.png");
+    public static ImageIcon body = new ImageIcon(bodyUrl);
+    //食物
+    public static URL foodUrl = Date.class.getResource("/statics/food.png");
+    public static ImageIcon food = new ImageIcon(foodUrl);
+
+
+}
